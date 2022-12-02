@@ -51,6 +51,8 @@ private:
 
 	float ThisDeltaTime = 0.0f;
 	bool IsCameraRotate = false;
+	bool IsMoveCameraMouse = false;
+	char DirectionCameraMove;
 
 	void MoveCameraHorizontal(float Amount);
 	void MoveCameraVertical(float Amount);
@@ -58,4 +60,11 @@ private:
 	void StartCameraRotate();
 	void StopCameraRotate();
 	void TurnCamera(float Amount);
+	void MouseCameraHorizontalDirection(float Amount);
+	void MouseCameraVerticalDirection(float Amount);
+	void MouseCameraMove();
+
+	FVector2D GetMousePosition();
+	FVector2D GetGameViewportSize();
+
 };

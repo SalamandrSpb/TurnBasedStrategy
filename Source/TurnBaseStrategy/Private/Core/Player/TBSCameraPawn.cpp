@@ -40,6 +40,11 @@ void ATBSCameraPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsMoveCameraMouse)
+	{
+		MouseCameraMove();
+	}
+
 }
 
 // Called to bind functionality to input
@@ -52,10 +57,8 @@ void ATBSCameraPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("TurnCamera", this, &ATBSCameraPawn::TurnCamera);
 	PlayerInputComponent->BindAction("CameraRotate", IE_Pressed, this, &ATBSCameraPawn::StartCameraRotate);
 	PlayerInputComponent->BindAction("CameraRotate", IE_Released, this, &ATBSCameraPawn::StopCameraRotate);
-
-
-
-
+	PlayerInputComponent->BindAxis("MouseMoveCameraHorizontal", this, &ATBSCameraPawn::MouseCameraHorizontalDirection);
+	PlayerInputComponent->BindAxis("MouseMoveCameraVertical", this, &ATBSCameraPawn::MouseCameraVerticalDirection);
 
 }
 
@@ -100,5 +103,86 @@ void ATBSCameraPawn::TurnCamera(float Amount)
 	{
 		AddControllerYawInput(Amount);
 	}
+}
+
+void ATBSCameraPawn::MouseCameraHorizontalDirection(float Amount)
+{
+	if (!IsCameraRotate)
+	{
+		const FVector2D MousePosition = GetMousePosition();
+		if (MousePosition.X / GetGameViewportSize().X >= 0.975f)
+		{
+			IsMoveCameraMouse = true;
+			DirectionCameraMove = 'R';
+		} else if (MousePosition.X / GetGameViewportSize().X <= 0.025f)
+		{
+			IsMoveCameraMouse = true;
+			DirectionCameraMove = 'L';
+		}
+		else
+		{
+			IsMoveCameraMouse = false;
+		}
+	}
+}
+
+void ATBSCameraPawn::MouseCameraVerticalDirection(float Amount)
+{
+	if (!IsCameraRotate)
+	{
+		const FVector2D MousePosition = GetMousePosition();
+		if (MousePosition.Y / GetGameViewportSize().Y >= 0.975f)
+		{
+			IsMoveCameraMouse = true;
+			DirectionCameraMove = 'B';
+		} else if (MousePosition.Y / GetGameViewportSize().Y <= 0.025f)
+		{
+			IsMoveCameraMouse = true;
+			DirectionCameraMove = 'F';
+		}
+	
+	}
+}
+
+void ATBSCameraPawn::MouseCameraMove()
+{
+	switch (DirectionCameraMove)
+	{
+	case 'F':
+		MoveCameraVertical(1.0f);
+		break;
+	case 'B':
+		MoveCameraVertical(-1.0f);
+		break;
+	case 'R':
+		MoveCameraHorizontal(1.0f);
+		break;
+	case 'L':
+		MoveCameraHorizontal(-1.0f);
+		break;
+	default:
+		break;
+	}
+}
+
+FVector2D ATBSCameraPawn::GetMousePosition()
+{
+	FVector2D MousePosition;
+	if (GetWorld())
+	{
+		GetWorld()->GetGameViewport()->GetMousePosition(MousePosition);
+	}
+	return MousePosition;
+}
+
+FVector2D ATBSCameraPawn::GetGameViewportSize()
+{
+	FVector2D ViewportSize;
+	if (GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+
+	return ViewportSize;
 }
 
