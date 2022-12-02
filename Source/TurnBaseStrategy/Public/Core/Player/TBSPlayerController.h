@@ -14,5 +14,4 @@ class TURNBASESTRATEGY_API ATBSPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	ATBSPlayerController();
-	
 };
